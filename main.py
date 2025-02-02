@@ -14,6 +14,8 @@ import random
 import time
 import threading
 
+from settings import *
+
 debugging = False
 show_nums = True
 
@@ -44,6 +46,8 @@ point_labels = []
 def on_click(event):
     global iteration
 
+    lang = language_dict[current_language]
+
     x = event.xdata
     y = event.ydata
     if x is None or y is None:
@@ -55,8 +59,8 @@ def on_click(event):
         too_close = False
 
         iteration = None
-        iteration_text.config(text='Кількість ітерацій:')
-        feromone_label.config(text="Довжина:")
+        iteration_text.config(text=lang['iterations'])
+        feromone_label.config(text=lang['length'])
         stop_auto()
 
         for px, py in points:
@@ -82,8 +86,8 @@ def on_click(event):
     elif button == 3:
 
         iteration = None
-        iteration_text.config(text='Кількість ітерацій:')
-        feromone_label.config(text="Довжина:")
+        iteration_text.config(text=lang['iterations'])
+        feromone_label.config(text=lang['length'])
         stop_auto()
 
         if len(points)-1 == -1:
@@ -103,11 +107,6 @@ def on_click(event):
 distances = {}
 feromons = {}
 routes = {}
-standart_feromon: float = 0.2
-ALPHA: int = 1
-BETA: int = 3
-PUC: float = 0.64 # Коефіцієнт оновлення шляху (Pheromone update coefficient)
-Q: int = 4
 iteration = None
 
 def prepare():
@@ -227,10 +226,11 @@ def ant_colony():
         if feromone > 1:
             total_feromone_length += distances[edge]*10
 
+    lang = language_dict[current_language]
     if iteration >= 5:
-        feromone_label.config(text=f"Довжина: {total_feromone_length:.2f}")
+        feromone_label.config(text=f"{lang['length']} {total_feromone_length:.2f}")
     else:
-        feromone_label.config(text="Довжина:")
+        feromone_label.config(text=lang['length'])
 
     if debugging:
         print(f"Час виконання ітерації {iteration}:", time.time()-start, f'Для кількості мітст: {ants}')
@@ -282,7 +282,8 @@ def update_edges():
     nx.draw_networkx_edges(G, pos=pos, ax=ax, edge_color='green', width=widths, alpha=alpha_inverted)
     update_point_labels(text_color=text_color)
     if iteration is not None:
-        iteration_text.config(text=f'Кількість ітерацій: {iteration}')
+        lang = language_dict[current_language]
+        iteration_text.config(text=f'{lang['iterations']} {iteration}')
     canvas.draw()
 
 def exit_program():
@@ -297,8 +298,8 @@ def show_error_message(message, type = 0):
         dur = 1000
 
     toast = ToastNotification(
-        title = "Помилка!",
-        message = message,
+        title = "Помилка!" if current_language == 'uk' else "Error!",
+        message = message if current_language == 'uk' else errors_dict[message],
         duration = dur,
         icon=' ⚠'
     )
@@ -317,7 +318,7 @@ def choose_image():
         update_point_labels(text_color=text_color)
         canvas.draw()
     except:
-        show_error_message('Оберіть картину')
+        show_error_message('Оберіть картинку')
 
 def clear_image(a=0):
     global img_array
@@ -403,6 +404,9 @@ stop_auto_iteration = False
 def start_auto() -> None:
     global stop_auto_iteration
 
+    if iteration is None:
+        start_algor()
+
     stop_auto_iteration = False
     thread = threading.Thread(target=auto_iteration)
     thread.start()
@@ -418,6 +422,7 @@ def auto_iteration():
 
     clear = False
     try:
+
         while not stop_auto_iteration:
             ant_colony()
             time.sleep(0.3)
@@ -444,6 +449,7 @@ def update_optins():
 
 selected_var = IntVar(value=0)
 is_random = False
+
 def handle_check_button():
     global is_random
     if selected_var.get() == 1: is_random = True
@@ -457,35 +463,64 @@ def unshow_nums():
         return
     show_nums = False if show_nums else True
     if show_nums:
-        show_nums_button.config(text="Приховати номери")
+        show_nums_button.config(text="Приховати номери" if current_language == 'uk' else "Hide Numbers")
     else:
-        show_nums_button.config(text="Показати номери")
+        show_nums_button.config(text="Показати номери" if current_language == 'uk' else "Show Numbers")
 
     reload_graph()
     update_edges()
     update_point_labels()
 
+def update_ui_language():
+    lang = language_dict[current_language]
+    start_button.config(text=lang['start'])
+    choose_image_button.config(text=lang['choose_image'])
+    clear_image_button.config(text=lang['clear_image'])
+    clear_points_button.config(text=lang['clear_points'])
+    change_color_button.config(text=lang['change_color'])
+    show_nums_button.config(text=lang['show_nums'])
+    start_new_iteration_button.config(text=lang['start_new_iteration'])
+    checkbutton.config(text=lang['random_city'])
+    label1.config(text=lang['auto'])
+    start_auto_button.config(text=lang['start_auto'])
+    stop_auto_button.config(text=lang['stop_auto'])
+    iteration_text.config(text=lang['iterations'])
+    feromone_label.config(text=lang['length'])
+    num_of_options_text.config(text=lang['options'])
+    menu_frame.config(text=lang['menu'])
+
+def switch_language():
+    global current_language
+    current_language = 'en' if current_language == 'uk' else 'uk'
+    update_ui_language()
+
 canvas.get_tk_widget().pack(side=ttk.LEFT, fill=ttk.BOTH, expand=True, padx=10, pady=15)
 
-menu_frame = Labelframe(frame, text="Меню", padding="10")
-menu_frame.pack(fill="both", expand="yes", padx=10, pady=15)
+menu_frame = Labelframe(frame, padding="10")
+menu_frame.pack(fill="both", expand="yes", padx=10, pady=(3, 15))
 
-start_button = ttk.Button(menu_frame, text="Почати", command=start_algor)
-choose_image_button = ttk.Button(menu_frame, text="Обрати картину для фону", command=choose_image)
-clear_image_button = ttk.Button(menu_frame, text="Очистити фон", command=clear_image)
-clear_points_button = ttk.Button(menu_frame, text="Очистити точки", command=clear_points)
-change_color_button = ttk.Button(menu_frame, text="Змінити колір крапочок", command=change_dot_color)
-show_nums_button = ttk.Button(menu_frame, text="Приховати номери", command=unshow_nums)
-start_new_iteration_button = ttk.Button(menu_frame, text="Почати нову ітерацію", command=ant_colony)
-checkbutton = ttk.Checkbutton(menu_frame, text="Випадкове місто", variable=selected_var, onvalue=1, offvalue=0, command=handle_check_button)
-label1 = tk.Label(menu_frame, text='Автоматично', font=("Arial", 10, "bold"))
-start_auto_button = ttk.Button(menu_frame, text="Почати", command=start_auto)
-stop_auto_button = ttk.Button(menu_frame, text="Зупинити", command=stop_auto)
-iteration_text = tk.Label(menu_frame, text='Кількість ітерацій:', font=("Arial", 10, "bold"))
-feromone_label = tk.Label(menu_frame, text="Довжина:", font=("Arial", 10, "bold"))
-num_of_options_text = tk.Label(menu_frame, text="Кількість варіантів шляху:", font=("Arial", 10, "bold"))
+menu_bar = tk.Menu(window)
+window.config(menu=menu_bar)
+
+language_menu = tk.Menu(menu_bar, tearoff=0)
+language_menu.add_command(label="Switch Language", command=switch_language)
+menu_bar.add_cascade(label="Language", menu=language_menu)
+
+start_button = ttk.Button(menu_frame, command=start_algor)
+choose_image_button = ttk.Button(menu_frame, command=choose_image)
+clear_image_button = ttk.Button(menu_frame, command=clear_image)
+clear_points_button = ttk.Button(menu_frame, command=clear_points)
+change_color_button = ttk.Button(menu_frame, command=change_dot_color)
+show_nums_button = ttk.Button(menu_frame, command=unshow_nums)
+start_new_iteration_button = ttk.Button(menu_frame, command=ant_colony)
+checkbutton = ttk.Checkbutton(menu_frame, variable=selected_var, onvalue=1, offvalue=0, command=handle_check_button)
+label1 = tk.Label(menu_frame, font=("Arial", 10, "bold"))
+start_auto_button = ttk.Button(menu_frame, command=start_auto)
+stop_auto_button = ttk.Button(menu_frame, command=stop_auto)
+iteration_text = tk.Label(menu_frame, font=("Arial", 10, "bold"))
+feromone_label = tk.Label(menu_frame, font=("Arial", 10, "bold"))
+num_of_options_text = tk.Label(menu_frame, font=("Arial", 10, "bold"))
 num_of_options = ttk.Label(menu_frame, text="", font=("Arial", 10, "bold"), anchor="center")
-exit_button = ttk.Button(menu_frame, text="Вихід", command=exit_program, bootstyle="danger")
 
 start_button.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=5)
 choose_image_button.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=5)
@@ -502,7 +537,6 @@ iteration_text.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=5)
 feromone_label.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=5)
 num_of_options_text.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=5)
 num_of_options.pack(side=ttk.TOP, fill=ttk.X, padx=5, pady=1)
-exit_button.pack(side=ttk.BOTTOM, fill=ttk.X, padx=5, pady=5)
 
 ax.spines['top'].set_linewidth(0)
 ax.spines['right'].set_linewidth(0)
@@ -513,4 +547,5 @@ ax.yaxis.set_visible(False)
 
 cid = canvas.mpl_connect('button_press_event', on_click)
 
+update_ui_language()
 window.mainloop()
