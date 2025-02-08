@@ -21,22 +21,28 @@ ACO algorithm, and visualize the pheromone-based pathfinding process.
 
 ## Installation
 
-Ensure you have Python installed, then install the required dependencies:
+Create and activate a Python virtual environment:  
 
 ```bash
-pip install matplotlib networkx numpy Pillow ttkbootstrap
+python3 -m venv venv
+source venv/bin/activate  # For Linux and macOS
+# or
+venv\Scripts\activate     # For Windows
 ```
-
 ---
+
+Install the required dependencies from `requirements.txt`:  
+
+```bash
+pip install -r requirements.txt
+```
 
 ## Usage
 
 Run the application using:
 
 ```bash
-python3 main.py    # For Linux and macOS
-# or
-python main.py    # For Windows
+python main.py
 ```
 
 ---
