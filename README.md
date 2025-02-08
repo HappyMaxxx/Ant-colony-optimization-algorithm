@@ -29,13 +29,14 @@ source venv/bin/activate  # For Linux and macOS
 # or
 venv\Scripts\activate     # For Windows
 ```
----
 
 Install the required dependencies from `requirements.txt`:  
 
 ```bash
 pip install -r requirements.txt
 ```
+
+---
 
 ## Usage
 
