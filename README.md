@@ -86,3 +86,4 @@ The Ant Colony Optimization (ACO) algorithm is inspired by the foraging behavior
 ### Author
 
 Developed as a course project in the discipline “Algorithmization and Programming” in the first year of study of the specialty 122 “Computer Science” at VNTU.
+2024 1cs-23b Max Patyk.
