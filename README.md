@@ -48,7 +48,7 @@ python main.py
 
 ---
 
-### Controls 
+## Controls 
 
 - **Left Click:** Add a city (point) to the graph.
 - **Right Click:** Remove a city.
@@ -62,7 +62,7 @@ python main.py
 
 ---
 
-### Algorithm Overview
+## Algorithm Overview
 
 The Ant Colony Optimization (ACO) algorithm is inspired by the foraging behavior of ants. Key steps include:
 
@@ -74,7 +74,7 @@ The Ant Colony Optimization (ACO) algorithm is inspired by the foraging behavior
 
 ---
 
-### Parameters
+## Parameters
 
 - **Alpha (α):** Controls the influence of pheromones.
 - **Beta (β):** Controls the influence of distance.
@@ -83,7 +83,7 @@ The Ant Colony Optimization (ACO) algorithm is inspired by the foraging behavior
 
 ---
 
-### Author
+## Author
 
 Developed as a course project in the discipline “Algorithmization and Programming” in the first year of study of the specialty 122 “Computer Science” at VNTU.
 2024 1cs-23b Max Patyk.
